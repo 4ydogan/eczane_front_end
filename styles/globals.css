@@ -1,9 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html,
 body {
   padding: 0;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif,
+    Josefin Sans, cursive;
 }
 
 a {
@@ -21,6 +26,136 @@ a {
   }
   body {
     color: white;
-    background: black;
+    background: rgba(0, 0, 0, 0.85);
   }
 }
+
+/* FormDemo.css */
+
+.form-demo .card {
+  min-width: 450px;
+}
+.form-demo .card form {
+  margin-top: 2rem;
+}
+.form-demo .card .field {
+  margin-bottom: 1.5rem;
+}
+@media screen and (max-width: 960px) {
+  .form-demo .card {
+    width: 80%;
+  }
+}
+@media screen and (max-width: 640px) {
+  .form-demo .card {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Write your CSS here */
+.nav-bar-container-light {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 15px;
+  background-color: white;
+  border-bottom-style: solid;
+  border-bottom-color: #dcdcdc;
+  border-bottom-width: 2px;
+  height: 110px;
+}
+
+.website-logo {
+  width: 40px;
+  height: 40px;
+}
+
+.middle-items {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  list-style-type: none;
+  padding: 0px;
+}
+
+.list-item {
+  font-size: 16px;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.link-light {
+  color: #171f46;
+  text-decoration: none;
+}
+
+.theme-button {
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  border-style: none;
+  outline: none;
+}
+
+.theme-img {
+  width: 40px;
+  height: 40px;
+}
+
+.nav{
+  align-items: center;
+  display: grid;
+  /* text-align: center; */
+  place-content: left;
+  padding: 20px;
+  text-decoration-line: underline;
+  color: #c7237d;
+  font-size: 20px;
+}
+
+
+/* DataTableDemo.css */
+
+.datatable-crud-demo .table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+@media screen and (max-width: 960px) {
+  .datatable-crud-demo .table-header {
+      align-items: flex-start;
+  }
+}
+.datatable-crud-demo .product-image {
+  width: 100px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+.datatable-crud-demo .p-dialog .product-image {
+  width: 150px;
+  margin: 0 auto 2rem auto;
+  display: block;
+}
+.datatable-crud-demo .confirmation-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media screen and (max-width: 960px) {
+  .datatable-crud-demo .p-toolbar {
+      flex-wrap: wrap;
+  }
+  .datatable-crud-demo .p-toolbar .p-button {
+      margin-bottom: 0.25rem;
+  }
+  .datatable-crud-demo .table-header {
+      flex-direction: column;
+  }
+  .datatable-crud-demo .table-header .p-input-icon-left, .datatable-crud-demo .table-header input {
+      width: 100%;
+  }
+}
+               
