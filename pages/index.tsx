@@ -1,8 +1,17 @@
+import axios from 'axios';
 import Head from 'next/head'
 import Image from 'next/image'
+import { useEffect } from 'react'
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
+
+  useEffect(() => {
+    // axios.get('/Stok').then((res) => {
+    //   console.log(res.data);
+    // })
+  }, []);
+
   return (
     <div className={styles.container}>
       <Head>

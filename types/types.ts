@@ -1,9 +1,9 @@
 export type Eczane = {
-  name: string,
-  adress: string,
-  start_time: string,
-  end_time: string,
-  tel_no: string,
+  isim: string,
+  adres: string,
+  acilis_saati: string,
+  kapanis_saati: string,
+  telefon_no: string,
   yonetici_id: string,
   eczane_id: string
 }
@@ -18,7 +18,7 @@ export type Kisi = {
 export type Urun = {
   urun_id: string,
   urun_turu: string,
-  urun_adi: string
+  urun_adı: string
 }
 
 export type Kullanici = {
@@ -30,6 +30,7 @@ export type Kullanici = {
 
 export type Calisan = {
   eczane_id: string,
+  isim: string,
   tc_no: string,
   maas: number,
   pozisyon: string,
@@ -37,11 +38,15 @@ export type Calisan = {
 }
 
 export type Satis = {
+  eczane_id: string,
+  urun_id: string,
   satilma_tarihi: string
 }
 
 export type Stok = {
   eczane_id: string,
   urun_id: string,
-  adet: number
+  adet: number,
+  isim: string,
+  urun_adı: string
 }

@@ -26,6 +26,12 @@ export default function NavBar() {
         <li>
           <Link href="/calisan" className=""> Çalışanlar </Link>
         </li>
+        <li>
+          <Link href="/register" className=""> Register </Link>
+        </li>
+        <li>
+          <Link href="/login" className=""> Login </Link>
+        </li>
       </ul>
     </nav>
   )

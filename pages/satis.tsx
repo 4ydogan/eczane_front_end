@@ -10,17 +10,17 @@ import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
 import axios from "axios";
 
-import { Stok, Eczane, Urun } from "../types/types";
+import { Satis, Eczane, Urun } from "../types/types";
 
-type Item = Stok;
+type Item = Satis;
 
 const UrunList = (props: any) => {
   let emptyItem = {
     eczane_id: "",
     urun_id: "",
-    adet: 0,
     isim: "",
     urun_adı: "",
+    satilma_tarihi: "",
   };
 
   const [items, setItems] = useState<Item[]>([]);
@@ -52,7 +52,7 @@ const UrunList = (props: any) => {
   );
 
   useEffect(() => {
-    axios.get("/stok").then((response) => setItems(response.data));
+    axios.get("/satis").then((response) => setItems(response.data));
     axios.get("/eczane").then((response) => setEczaneler(response.data));
     axios.get("/urun").then((response) => setUrunler(response.data));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -80,13 +80,13 @@ const UrunList = (props: any) => {
   const saveItem = () => {
     setSubmitted(true);
 
-    if (item.adet) {
+    if (item.eczane_id) {
       let _items = [...items];
       let _item = { ...item };
 
       if (editType === "new") {
         axios
-          .post("/stok", _item)
+          .post("/satis", _item)
           .then((response) => {
             console.log(response);
           })
@@ -112,7 +112,7 @@ const UrunList = (props: any) => {
         const index = findIndexById(_item.eczane_id, _item.urun_id);
 
         axios
-          .put("/stok", _item)
+          .put("/satis", _item)
           .then((response) => {
             console.log(response);
           })
@@ -125,8 +125,12 @@ const UrunList = (props: any) => {
             .isim
         );
 
-        _item.isim = eczaneler?.find( (eczane) => {return eczane.eczane_id === _item.eczane_id} ).isim;
-        _item.urun_adı = urunler?.find( (urun) => {return urun.urun_id === _item.urun_id} ).urun_adı;
+        _item.isim = eczaneler?.find((eczane) => {
+          return eczane.eczane_id === _item.eczane_id;
+        }).isim;
+        _item.urun_adı = urunler?.find((urun) => {
+          return urun.urun_id === _item.urun_id;
+        }).urun_adı;
         _items[index] = _item;
 
         toast.current.show({
@@ -161,7 +165,7 @@ const UrunList = (props: any) => {
     let _items = items.filter((val) => val.eczane_id !== item.eczane_id);
 
     axios
-      .delete("/stok", { data: item })
+      .delete("/satis", { data: item })
       .then((response) => {
         console.log(response);
       })
@@ -212,7 +216,7 @@ const UrunList = (props: any) => {
 
     delete_items.forEach((item_del) =>
       axios
-        .delete("/stok", { data: item_del })
+        .delete("/satis", { data: item_del })
         .then((response) => {
           console.log(response);
         })
@@ -433,7 +437,7 @@ const UrunList = (props: any) => {
           />
         </div>
         <div className="field">
-          <label htmlFor="adet">Stok Adedi</label>
+          <label htmlFor="adet">satis Adedi</label>
           <InputNumber
             id="adet"
             value={item.adet}
