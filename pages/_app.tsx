@@ -33,15 +33,6 @@ export default function App({ Component, pageProps }: AppProps) {
     axios.defaults.headers.common["user_id"] = user_id;
     axios.defaults.headers.common["yetki"] = yetki;
 
-    // localStorage.getItem("user_id") !== (undefined || null)
-    //   ? setUserID(localStorage.getItem("user_id")?.toString())
-    //   : setUserID(null);
-    // localStorage.getItem("yetki") !== (undefined || null)
-    //   ? setYetki(localStorage.getItem("yetki")?.toString())
-    //   : setYetki(null);
-
-    console.log(user_id);
-
     setTimeout(() => {
       if (router.pathname !== ("/login" && "/register") && user_id === null)
         router.push("/login");
@@ -57,15 +48,28 @@ export default function App({ Component, pageProps }: AppProps) {
           <Register />
         )
       ) : (
-        <Row>
+        <div>
+          <Row className="bg-light border">
+            <NavBar />
+          </Row>
+          <div className="main-div">
+            <Row className="bg-light border">
+              <Component {...pageProps} />
+            </Row>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+{
+  /* <Row>
           <Col className="bg-light border" xs="2">
             <NavBar />
           </Col>
           <Col className="bg-light border" xs="10">
             <Component {...pageProps} />
           </Col>
-        </Row>
-      )}
-    </>
-  );
+        </Row> */
 }

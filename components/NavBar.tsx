@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Button } from "primereact/button"
 
 export default function NavBar() {
 
@@ -32,6 +33,10 @@ export default function NavBar() {
         <li>
           <Link href="/login" className=""> Login </Link>
         </li>
+        <li>
+          <Button label="Çıkış Yap" className="p-button-danger" />
+        </li>
+        
       </ul>
     </nav>
   )

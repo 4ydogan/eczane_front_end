@@ -77,6 +77,28 @@ const UrunList = (props: any) => {
     setDeleteItemsDialog(false);
   };
 
+  const find_eczane_isim = (eczane_id: any) => {
+    let result = "";
+    eczaneler.forEach((eczane) => {
+      if (eczane.eczane_id === eczane_id) {
+        result = eczane.eczane_id;
+      }
+    });
+
+    return result;
+  };
+  
+  const find_urun_isim = (urun_id: any) => {
+    let result = "";
+    urunler.forEach((urun) => {
+      if (urun.urun_id === urun_id) {
+        result = urun.urun_id;
+      }
+    });
+
+    return result;
+  };
+
   const saveItem = () => {
     setSubmitted(true);
 
@@ -94,12 +116,8 @@ const UrunList = (props: any) => {
             console.log(error);
           });
 
-        _item.isim = eczaneler.filter(
-          (eczane) => eczane.eczane_id === _item.eczane_id
-        )[0].isim;
-        _item.urun_adı = urunler.filter(
-          (urun) => urun.urun_id === _item.urun_id
-        )[0].urun_adı;
+        _item.isim = find_eczane_isim(_item.eczane_id);
+        _item.urun_adı = find_urun_isim(_item.urun_id);
 
         _items.push(_item);
         toast.current.show({
