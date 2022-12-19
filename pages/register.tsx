@@ -21,6 +21,9 @@ const Register = () => {
     user_id: "",
     username: "",
     password: "",
+    ad: '',
+    soyad: '',
+    adres: ''
   };
 
   const {
@@ -38,8 +41,6 @@ const Register = () => {
       .post("/register", data)
       .then(function (response) {
         localStorage.setItem("user_id", response.data);
-        console.log(data)
-        console.log(response.data)
         router.push('/');
       })
       .catch(function (error) {
@@ -142,7 +143,6 @@ const Register = () => {
                     <InputText
                       id={field.name}
                       {...field}
-                      autoFocus
                       className={classNames({
                         "p-invalid": fieldState.invalid,
                       })}
@@ -185,6 +185,81 @@ const Register = () => {
                 </label>
               </span>
               {getFormErrorMessage("password")}
+            </div>
+            <div className="field">
+              <span className="p-float-label">
+                <Controller
+                  name="ad"
+                  control={control}
+                  rules={{ required: "Ad is required." }}
+                  render={({ field, fieldState }) => (
+                    <InputText
+                      id={field.ad}
+                      {...field}
+                      className={classNames({
+                        "p-invalid": fieldState.invalid,
+                      })}
+                    />
+                  )}
+                />
+                <label
+                  htmlFor="ad"
+                  className={classNames({ "p-error": errors.username })}
+                >
+                  Ad*
+                </label>
+              </span>
+              {getFormErrorMessage("ad")}
+            </div>
+            <div className="field">
+              <span className="p-float-label">
+                <Controller
+                  name="soyad"
+                  control={control}
+                  rules={{ required: "Soyad is required." }}
+                  render={({ field, fieldState }) => (
+                    <InputText
+                      id={field.name}
+                      {...field}
+                      className={classNames({
+                        "p-invalid": fieldState.invalid,
+                      })}
+                    />
+                  )}
+                />
+                <label
+                  htmlFor="soyad"
+                  className={classNames({ "p-error": errors.username })}
+                >
+                  Soyad*
+                </label>
+              </span>
+              {getFormErrorMessage("soyad")}
+            </div>
+            <div className="field">
+              <span className="p-float-label">
+                <Controller
+                  name="adres"
+                  control={control}
+                  rules={{ required: "Adress is required." }}
+                  render={({ field, fieldState }) => (
+                    <InputText
+                      id={field.name}
+                      {...field}
+                      className={classNames({
+                        "p-invalid": fieldState.invalid,
+                      })}
+                    />
+                  )}
+                />
+                <label
+                  htmlFor="adres"
+                  className={classNames({ "p-error": errors.username })}
+                >
+                  Adres*
+                </label>
+              </span>
+              {getFormErrorMessage("adres")}
             </div>
 
             <Button type="submit" label="Submit" className="mt-2" />

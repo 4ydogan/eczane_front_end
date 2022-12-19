@@ -11,6 +11,8 @@ import { Dropdown } from "primereact/dropdown";
 import axios from "axios";
 
 import { Urun } from "../types/types";
+import { NextRouter, useRouter } from "next/router";
+import { InputNumber } from "primereact/inputnumber";
 
 type Item = Urun;
 
@@ -19,6 +21,7 @@ const UrunList = (props: any) => {
     urun_id: "",
     urun_turu: "",
     urun_adı: "",
+    fiyat: 0
   };
   const [items, setItems] = useState<Item[]>([]);
   const [editType, setEditType] = useState<"edit" | "new">("new");
@@ -57,7 +60,18 @@ const UrunList = (props: any) => {
 
   useEffect(() => {
     axios.get("/urun").then((response) => setItems(response.data));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [itemDialog]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const [user_id, setUserID] = useState<undefined | null | string>(null);
+  const [yetki, setYetki] = useState<undefined | null | string>(null);
+
+  const router: NextRouter = useRouter();
+
+  useEffect(() => {
+    setUserID(localStorage.getItem("user_id"));
+    setYetki(localStorage.getItem("yetki"));
+
+  }, [router.pathname]);
 
   const openNew = () => {
     setItem(emptyItem);
@@ -91,9 +105,8 @@ const UrunList = (props: any) => {
           .post("/urun", _item)
           .then((response) => {
             _item.urun_id = response.data.urun_id;
-          }).then(
-            () =>  _items.push(_item)
-          )
+            _items.push(_item);
+          })
           .catch((error) => {
             console.log(error);
           });
@@ -207,7 +220,6 @@ const UrunList = (props: any) => {
         })
     );
 
-    console.log(delete_items);
     setItems(_items);
     setDeleteItemsDialog(false);
     setSelectedItems([]);
@@ -236,13 +248,15 @@ const UrunList = (props: any) => {
           className="p-button-success mr-2"
           onClick={openNew}
         />
-        <Button
-          label="Delete"
-          icon="pi pi-trash"
-          className="p-button-danger"
-          onClick={confirmDeleteSelected}
-          disabled={!selectedItems || !selectedItems.length}
-        />
+        {yetki === "admin" ? <>
+          <Button
+            label="Delete"
+            icon="pi pi-trash"
+            className="p-button-danger"
+            onClick={confirmDeleteSelected}
+            disabled={!selectedItems || !selectedItems.length}
+          />
+        </> : null}
       </React.Fragment>
     );
   };
@@ -250,23 +264,35 @@ const UrunList = (props: any) => {
   const actionBodyTemplate = (rowData: any) => {
     return (
       <React.Fragment>
-        <Button
-          icon="pi pi-pencil"
-          className="p-button-rounded p-button-success mr-2"
-          onClick={() => editItem(rowData)}
-        />
-        <Button
-          icon="pi pi-trash"
-          className="p-button-rounded p-button-warning"
-          onClick={() => confirmDeleteItem(rowData)}
-        />
-      </React.Fragment>
+        {yetki === "admin" ? <>
+          <Button
+            icon="pi pi-pencil"
+            className="p-button-rounded p-button-success mr-2"
+            onClick={() => editItem(rowData)}
+          />
+
+          <Button
+            icon="pi pi-trash"
+            className="p-button-rounded p-button-warning"
+            onClick={() => confirmDeleteItem(rowData)}
+          />
+        </> : null
+        }
+      </React.Fragment >
     );
+  };
+
+  const onInputNumberChange = (e: any, name: any) => {
+    const val = e.value || 0;
+    let _item = { ...item };
+    _item[`${name}`] = val;
+
+    setItem(_item);
   };
 
   const header = (
     <div className="table-header">
-      <h5 className="mx-0 my-1">Manage Items</h5>
+      <h5 className="mx-0 my-1">Urunler</h5>
     </div>
   );
 
@@ -295,12 +321,12 @@ const UrunList = (props: any) => {
         className="p-button-text"
         onClick={hideDeleteItemDialog}
       />
-      <Button
+      {yetki === "admin" ? <Button
         label="Yes"
         icon="pi pi-check"
         className="p-button-text"
         onClick={deleteItem}
-      />
+      /> : null}
     </React.Fragment>
   );
 
@@ -366,6 +392,12 @@ const UrunList = (props: any) => {
             style={{ minWidth: "16rem" }}
           ></Column>
           <Column
+            field="fiyat"
+            header="Fiyat"
+            sortable
+            style={{ minWidth: "16rem" }}
+          ></Column>
+          <Column
             body={actionBodyTemplate}
             exportable={false}
             style={{ minWidth: "8rem" }}
@@ -405,6 +437,21 @@ const UrunList = (props: any) => {
             virtualScrollerOptions={{ itemSize: 38 }}
             onChange={(e) => onInputChange(e, "urun_turu")}
           />
+        </div>
+        <div className="field">
+          <label htmlFor="fiyat">Fiyat</label>
+          <InputNumber
+            id="fiyat"
+            value={item.fiyat}
+            onChange={(e) => onInputNumberChange(e, "fiyat")}
+            required
+            autoFocus
+            mode="currency" currency="TRY" locale="en-US"
+            className={classNames({ "p-invalid": submitted && !item.fiyat })}
+          />
+          {submitted && !item.fiyat && (
+            <small className="p-error">Fiyat is required.</small>
+          )}
         </div>
       </Dialog>
 

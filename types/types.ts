@@ -18,14 +18,18 @@ export type Kisi = {
 export type Urun = {
   urun_id: string,
   urun_turu: string,
-  urun_adı: string
+  urun_adı: string,
+  fiyat: number
 }
 
 export type Kullanici = {
   user_id: string,
   kullanici_adi: string,
   parola: string,
-  yetki: string
+  yetki: string,
+  ad: string,
+  soyad: string,
+  adres: string
 }
 
 export type Calisan = {
@@ -40,7 +44,10 @@ export type Calisan = {
 export type Satis = {
   eczane_id: string,
   urun_id: string,
-  satilma_tarihi: string
+  satilma_tarihi: string,
+  isim: string,
+  urun_adı: string,
+  adet: number
 }
 
 export type Stok = {

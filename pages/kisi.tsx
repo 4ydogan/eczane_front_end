@@ -194,7 +194,6 @@ const UrunList = () => {
         })
     );
 
-    console.log(delete_items);
     setItems(_items);
     setDeleteItemsDialog(false);
     setSelectedItems([]);
@@ -253,7 +252,7 @@ const UrunList = () => {
 
   const header = (
     <div className="table-header">
-      <h5 className="mx-0 my-1">Manage Items</h5>
+      <h5 className="mx-0 my-1">Kişiler</h5>
     </div>
   );
 

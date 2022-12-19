@@ -1,17 +1,133 @@
-import axios from 'axios';
+import React, { useState, useEffect, useRef, ReactPropTypes } from "react";
+import { Dropdown } from 'primereact/dropdown';
+import { InputNumber } from 'primereact/inputnumber';
+import { classNames } from "primereact/utils";
+import { Button } from "primereact/button";
+import { Row } from 'reactstrap';
 import Head from 'next/head'
-import Image from 'next/image'
-import { useEffect } from 'react'
+import axios from 'axios';
+
 import styles from '../styles/Home.module.css'
+import { Satis, Eczane, Urun } from "../types/types";
+import { NextRouter, useRouter } from "next/router";
+import { Toast } from "primereact/toast";
 
 export default function Home() {
 
-  useEffect(() => {
-    // axios.get('/Stok').then((res) => {
-    //   console.log(res.data);
-    // })
-  }, []);
+  let emptyItem = {
+    eczane_id: "",
+    urun_id: "",
+    isim: "",
+    urun_adı: "",
+    satilma_tarihi: "",
+    adet: 0
+  };
 
+  const [eczaneler, setEczaneler] = useState<Eczane[]>([]);
+  const [urunler, setUrunler] = useState<Urun[]>([]);
+  const [item, setItem] = useState<Satis>(emptyItem);
+  const [submitted, setSubmitted] = useState(false);
+  const toast = useRef(null);
+
+  let eczane_opt = Array.from(
+    eczaneler.map((eczane) => ({
+      label: `${eczane.isim}`,
+      value: `${eczane.isim}`,
+    }))
+  );
+
+  let urun_opt = Array.from(
+    urunler.map((urun) => ({
+      label: `${urun.urun_adı}`,
+      value: `${urun.urun_adı}`,
+    }))
+  );
+
+  const find_eczane_id = (isim: any) => {
+    let result = "";
+    eczaneler.forEach((eczane) => {
+      if (eczane.isim === isim) {
+        result = eczane.eczane_id;
+      }
+    });
+
+    return result;
+  };
+
+  const find_urun_id = (urun_adı: any) => {
+    let result = "";
+    urunler.forEach((urun) => {
+      if (urun.urun_adı === urun_adı) {
+        result = urun.urun_id;
+      }
+    });
+
+    return result;
+  };
+
+  const [user_id, setUserID] = useState<undefined | null | string>(null);
+  const [yetki, setYetki] = useState<undefined | null | string>(null);
+
+  const router: NextRouter = useRouter();
+
+  useEffect(() => {
+    setUserID(localStorage.getItem("user_id"));
+    setYetki(localStorage.getItem("yetki") === null ? "null" : localStorage.getItem("yetki"));
+
+    console.log(yetki)
+
+  }, [router.pathname]);
+
+  useEffect(() => {
+    axios.get("/eczane").then((response) => setEczaneler(response.data));
+    axios.get("/urun").then((response) => setUrunler(response.data));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const saveItem = () => {
+    setSubmitted(true);
+    
+    if (item.adet) {
+      let _item = { ...item };
+      
+      _item.eczane_id = find_eczane_id(_item.isim);
+      _item.urun_id = find_urun_id(_item.urun_adı);
+      console.log(_item)
+
+      axios
+        .post("/satis", _item)
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      toast.current.show({
+        severity: "success",
+        summary: "Successful",
+        detail: "Item Created",
+        life: 3000,
+      });
+
+      setItem(emptyItem);
+    }
+  };
+
+  const onInputChange = (e: any, name: any) => {
+    const val = (e.target && e.target.value) || "";
+    let _item = { ...item };
+    _item[`${name}`] = val;
+
+    setItem(_item);
+  };
+
+  const onInputNumberChange = (e: any, name: any) => {
+    const val = e.value || 0;
+    let _item = { ...item };
+    _item[`${name}`] = val;
+
+    setItem(_item);
+  };
   return (
     <div className={styles.container}>
       <Head>
@@ -20,53 +136,99 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <Toast ref={toast} />
+
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Eczane Yönetim Sayfası
+          Eczaneler Birliği Yönetim Sayfasına Hoşgeldiniz
         </h1>
+        <br />
+        <br />
+        {
+          yetki === "null"
+            ? (<>
+              <h1 className={styles.title}>
+                Hiçbir yetkiniz yoktur. Yönetici ile iletişime geçiniz.
+              </h1>
+            </>)
+            : (
+              <>
+                <h1 className={styles.title}>
+                  Satış Yap
+                </h1>
 
-        <div className={styles.grid}>
-          <a href="/eczane" className={styles.card}>
-            <h2>Eczane &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+                <div className={styles.grid}>
+                  <div className={styles.card}>
+                    <Row
+                      style={{ width: "450px" }}
+                      header="Item Details"
+                      modal
+                      className="p-fluid main-div"
+                    >
+                      <div className="field">
+                        <label htmlFor="isim">Eczane</label>
+                        <Dropdown
+                          id="isim"
+                          options={eczane_opt}
+                          value={item.isim}
+                          virtualScrollerOptions={{ itemSize: 38 }}
+                          field="label"
+                          dropdown
+                          onChange={(e) => onInputChange(e, "isim")}
+                        />
+                      </div>
+                      <div className="field">
+                        <label htmlFor="urun_adı">Ürün</label>
+                        <Dropdown
+                          id="urun_adı"
+                          options={urun_opt}
+                          value={item.urun_adı}
+                          virtualScrollerOptions={{ itemSize: 38 }}
+                          field="label"
+                          dropdown
+                          onChange={(e) => onInputChange(e, "urun_adı")}
+                        />
+                      </div>
+                      <div className="field">
+                        <label htmlFor="adet">Satış Adedi</label>
+                        <InputNumber
+                          id="adet"
+                          value={item.adet}
+                          onChange={(e) => onInputNumberChange(e, "adet")}
+                          required
+                          autoFocus
+                          className={classNames({ "p-invalid": submitted && !item.adet })}
+                        />
+                        {submitted && !item.adet && (
+                          <small className="p-error">Adet is required.</small>
+                        )}
+                      </div>
 
-          <a href="/urunler" className={styles.card}>
-            <h2>Ürünler &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+                      <React.Fragment>
+                        <Button
+                          label="Save"
+                          icon="pi pi-check"
+                          onClick={saveItem}
+                        />
+                      </React.Fragment>
+                    </Row>
+                  </div>
 
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
+                </div>
+              </>
+            )
+        }
+      </main >
 
       <footer className={styles.footer}>
         <a
-          href="https://github.com/4ydogan"
+          href="https://www.etu.edu.tr/tr/bolum/bilgisayar-muhendisligi"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by 4ydogan
+          Powered by Cese Alfredos
         </a>
       </footer>
-    </div>
+    </div >
   )
 }

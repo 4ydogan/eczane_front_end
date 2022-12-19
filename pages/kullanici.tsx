@@ -14,12 +14,15 @@ import { Kullanici } from "../types/types";
 
 type Item = Kullanici;
 
-const UrunList = () => {
+const KullaniciList = () => {
   let emptyItem = {
     user_id: "",
     kullanici_adi: "",
     parola: "",
     yetki: "",
+    ad: '',
+    soyad: '',
+    adres: ''
   };
   const [items, setItems] = useState<Item[]>([]);
   const [editType, setEditType] = useState<"edit" | "new">("new");
@@ -33,10 +36,18 @@ const UrunList = () => {
   const toast = useRef(null);
   const dt = useRef(null);
 
-  let hours = Array.from({ length: 24 }).map((_, i) => ({
-    label: `${i < 10 ? "0" : ""}${i}:00:00`,
-    value: `${i < 10 ? "0" : ""}${i}:00:00`,
-  }));
+  let yetkiler = [{
+    label: "Yönetici",
+    value: "yonetici",
+  },
+  {
+    label: "Kullanıcı",
+    value: "kullanici",
+  },
+  {
+    label: "Admin",
+    value: "admin",
+  }];
 
   useEffect(() => {
     axios.get("/kullanici").then((response) => setItems(response.data));
@@ -65,32 +76,9 @@ const UrunList = () => {
   const saveItem = () => {
     setSubmitted(true);
 
-    if (item.isim.trim()) {
+    if (item.user_id) {
       let _items = [...items];
       let _item = { ...item };
-      if (item.eczane_id) {
-        const index = findIndexById(item.eczane_id);
-
-        _items[index] = _item;
-        toast.current.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Item Updated",
-          life: 3000,
-        });
-      } else {
-        _items.push(_item);
-        toast.current.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Item Created",
-          life: 3000,
-        });
-      }
-
-      setItems(_items);
-      setItemDialog(false);
-      setItem(emptyItem);
 
       if (editType === "new") {
         axios
@@ -101,7 +89,17 @@ const UrunList = () => {
           .catch((error) => {
             console.log(error);
           });
+
+        _items.push(_item);
+        toast.current.show({
+          severity: "success",
+          summary: "Successful",
+          detail: "Item Created",
+          life: 3000,
+        });
       } else if (editType === "edit") {
+        const index = findIndexById(item.user_id);
+
         axios
           .put("/kullanici", item)
           .then((response) => {
@@ -110,7 +108,19 @@ const UrunList = () => {
           .catch((error) => {
             console.log(error);
           });
+
+        _items[index] = _item;
+        toast.current.show({
+          severity: "success",
+          summary: "Successful",
+          detail: "Item Updated",
+          life: 3000,
+        });
       }
+
+      setItems(_items);
+      setItemDialog(false);
+      setItem(emptyItem);
     }
   };
 
@@ -127,7 +137,7 @@ const UrunList = () => {
   };
 
   const deleteItem = () => {
-    let _items = items.filter((val) => val.eczane_id !== item.eczane_id);
+    let _items = items.filter((val) => val.user_id !== item.user_id);
 
     axios
       .delete("/kullanici", { data: item })
@@ -152,7 +162,7 @@ const UrunList = () => {
   const findIndexById = (id: any) => {
     let index = -1;
     for (let i = 0; i < items.length; i++) {
-      if (items[i].eczane_id === id) {
+      if (items[i].user_id === id) {
         index = i;
         break;
       }
@@ -190,7 +200,6 @@ const UrunList = () => {
         })
     );
 
-    console.log(delete_items);
     setItems(_items);
     setDeleteItemsDialog(false);
     setSelectedItems([]);
@@ -249,7 +258,7 @@ const UrunList = () => {
 
   const header = (
     <div className="table-header">
-      <h5 className="mx-0 my-1">Manage Items</h5>
+      <h5 className="mx-0 my-1">Kullanıcılar</h5>
     </div>
   );
 
@@ -316,7 +325,7 @@ const UrunList = () => {
           value={items}
           selection={selectedItems}
           onSelectionChange={(e) => setSelectedItems(e.value)}
-          dataKey="id"
+          dataKey="user_id"
           paginator
           rows={10}
           rowsPerPageOptions={[5, 10, 25]}
@@ -418,7 +427,7 @@ const UrunList = () => {
           <label htmlFor="yetki">Yetki</label>
           <Dropdown
             id="yetki"
-            options={hours}
+            options={yetkiler}
             value={item.yetki}
             virtualScrollerOptions={{ itemSize: 38 }}
             field="label"
@@ -471,4 +480,4 @@ const UrunList = () => {
   );
 };
 
-export default UrunList;
+export default KullaniciList;

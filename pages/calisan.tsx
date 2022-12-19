@@ -12,7 +12,7 @@ import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import axios from "axios";
 
-import { Calisan } from "../types/types";
+import { Calisan, Eczane, Kullanici } from "../types/types";
 import { InputTextarea } from "primereact/inputtextarea";
 
 type Item = Calisan;
@@ -28,6 +28,7 @@ const UrunList = () => {
   };
 
   const [items, setItems] = useState<Item[]>([]);
+  const [kullanicilar, setKullanicilar] = useState<Kullanici[]>([]);
   const [eczaneler, setEczaneler] = useState<Eczane[]>([]);
   const [editType, setEditType] = useState<"edit" | "new">("new");
   const [itemDialog, setItemDialog] = useState(false);
@@ -39,6 +40,13 @@ const UrunList = () => {
   const [globalFilter, setGlobalFilter] = useState(null);
   const toast = useRef(null);
   const dt = useRef(null);
+
+  let kullanicilar_opt = Array.from(
+    kullanicilar.map((kullanici) => ({
+      label: `${kullanici.user_id}`,
+      value: `${kullanici.user_id}`,
+    }))
+  );
 
   let eczane_opt = Array.from(
     eczaneler.map((eczane) => ({
@@ -72,6 +80,7 @@ const UrunList = () => {
   useEffect(() => {
     axios.get("/calisan").then((response) => setItems(response.data));
     axios.get("/eczane").then((response) => setEczaneler(response.data));
+    axios.get("/kullanici").then((response) => setKullanicilar(response.data));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const openNew = () => {
@@ -158,7 +167,7 @@ const UrunList = () => {
   };
 
   const deleteItem = () => {
-    let _items = items.filter((val) => val.eczane_id !== item.eczane_id);
+    let _items = items.filter((val) => val.tc_no !== item.tc_no);
 
     axios
       .delete("/calisan", { data: item })
@@ -183,7 +192,7 @@ const UrunList = () => {
   const findIndexById = (id: any) => {
     let index = -1;
     for (let i = 0; i < items.length; i++) {
-      if (items[i].eczane_id === id) {
+      if (items[i].tc_no === id) {
         index = i;
         break;
       }
@@ -288,7 +297,7 @@ const UrunList = () => {
 
   const header = (
     <div className="table-header">
-      <h5 className="mx-0 my-1">Manage Items</h5>
+      <h5 className="mx-0 my-1">Çalışanlar</h5>
     </div>
   );
 
@@ -419,13 +428,16 @@ const UrunList = () => {
       >
         <div className="field">
           <label htmlFor="tc_no">TC No</label>
-          <InputText
+          <Dropdown
             id="tc_no"
             value={item.tc_no}
-            autoFocus
+            options={kullanicilar_opt}
+            virtualScrollerOptions={{ itemSize: 38 }}
+            field="label"
+            dropdown
             onChange={(e) => onInputChange(e, "tc_no")}
             required
-            className={classNames({ "p-invalid": submitted && !item.name })}
+            className={classNames({ "p-invalid": submitted && !item.tc_no })}
           />
           {submitted && !item.tc_no && (
             <small className="p-error">TC No is required.</small>

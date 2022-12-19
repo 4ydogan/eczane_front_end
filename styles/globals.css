@@ -34,6 +34,7 @@ a {
   html {
     color-scheme: dark;
   }
+
   body {
     color: white;
     background: rgba(0, 0, 0, 0.85);
@@ -45,17 +46,21 @@ a {
 .form-demo .card {
   min-width: 450px;
 }
+
 .form-demo .card form {
   margin-top: 2rem;
 }
+
 .form-demo .card .field {
   margin-bottom: 1.5rem;
 }
+
 @media screen and (max-width: 960px) {
   .form-demo .card {
     width: 80%;
   }
 }
+
 @media screen and (max-width: 640px) {
   .form-demo .card {
     width: 100%;
@@ -116,7 +121,7 @@ a {
   height: 40px;
 }
 
-.nav{
+.nav {
   align-items: center;
   display: grid;
   /* text-align: center; */
@@ -135,37 +140,46 @@ a {
   align-items: center;
   justify-content: space-between;
 }
+
 @media screen and (max-width: 960px) {
   .datatable-crud-demo .table-header {
-      align-items: flex-start;
+    align-items: flex-start;
   }
 }
+
 .datatable-crud-demo .product-image {
   width: 100px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
+
 .datatable-crud-demo .p-dialog .product-image {
   width: 150px;
   margin: 0 auto 2rem auto;
   display: block;
 }
+
 .datatable-crud-demo .confirmation-content {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 @media screen and (max-width: 960px) {
   .datatable-crud-demo .p-toolbar {
-      flex-wrap: wrap;
+    flex-wrap: wrap;
   }
+
   .datatable-crud-demo .p-toolbar .p-button {
-      margin-bottom: 0.25rem;
+    margin-bottom: 0.25rem;
   }
+
   .datatable-crud-demo .table-header {
-      flex-direction: column;
+    flex-direction: column;
   }
-  .datatable-crud-demo .table-header .p-input-icon-left, .datatable-crud-demo .table-header input {
-      width: 100%;
+
+  .datatable-crud-demo .table-header .p-input-icon-left,
+  .datatable-crud-demo .table-header input {
+    width: 100%;
   }
 }
 
@@ -177,23 +191,30 @@ a {
   padding: 10%;
   width: 50%;
 }
-             
-ul {
+
+.login-div input {
+  display: flex;
+  width: 95% !important;
+  margin: 10px;
+}
+
+.nav-ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: rgb(158, 18, 8);
+  background-color: #9A1663;
   width: 100%;
   display: flex;
   justify-content: center;
+  height: 60px;
 }
 
-li {
+.nav-ul li {
   float: left;
 }
 
-li a {
+.nav-ul li a {
   display: block;
   color: white;
   text-align: center;
@@ -202,13 +223,33 @@ li a {
 }
 
 /* Change the link color to #111 (black) on hover */
-li a:hover {
-  background-color: rgb(134, 3, 3);
-  color: rgb(19, 201, 201);
+.nav-ul li a:hover {
+  background-color: #75154d;
+  color: #ffffff;
 }
 
 .main-div {
-  margin: auto;
+  margin: auto !important;
   width: 90%;
   min-height: 90%;
+}
+
+.pi-eye {
+  padding-right: 10px;
+}
+
+.pi-eye-slash {
+  padding-right: 10px;
+}
+
+.text-center {
+  margin: auto;
+  padding-bottom: 0;
+  padding-top: 20px;
+}
+
+.logout{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

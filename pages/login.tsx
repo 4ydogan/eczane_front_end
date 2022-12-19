@@ -31,15 +31,13 @@ const Login = () => {
 
   const onSubmit = (data: any) => {
     setFormData(data);
-    setShowMessage(true);
 
     axios
       .post("/login", data)
       .then((response) => {
         localStorage.setItem("user_id", response.data.user_id);
         localStorage.setItem("yetki", response.data.yetki);
-        console.log(data);
-        console.log(response.data);
+        setShowMessage(true);
         router.push("/");
       })
       .catch(function (error) {
@@ -66,18 +64,6 @@ const Login = () => {
     </div>
   );
   const passwordHeader = <h6>Pick a password</h6>;
-  const passwordFooter = (
-    <React.Fragment>
-      <Divider />
-      <p className="mt-2">Suggestions</p>
-      <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: "1.5" }}>
-        <li>At least one lowercase</li>
-        <li>At least one uppercase</li>
-        <li>At least one numeric</li>
-        <li>Minimum 8 characters</li>
-      </ul>
-    </React.Fragment>
-  );
 
   return (
     <div className="form-demo">
@@ -104,7 +90,7 @@ const Login = () => {
           <h5 className="text-center">Login</h5>
           <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
             <div className="field">
-              <span className="p-float-label">
+              <span className="p-float-label input">
                 <Controller
                   name="username"
                   control={control}
@@ -139,12 +125,11 @@ const Login = () => {
                     <Password
                       id={field.name}
                       {...field}
+                      feedback={false}
                       toggleMask
                       className={classNames({
                         "p-invalid": fieldState.invalid,
                       })}
-                      header={passwordHeader}
-                      footer={passwordFooter}
                     />
                   )}
                 />

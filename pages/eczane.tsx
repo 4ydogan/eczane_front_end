@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, ReactPropTypes } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { classNames } from "primereact/utils";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -10,9 +10,9 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import axios from "axios";
-import { uuid } from "uuidv4";
 
-import { Eczane } from "../types/types";
+import { Eczane, Kullanici } from "../types/types";
+import { NextRouter, useRouter } from "next/router";
 
 type Item = Eczane;
 
@@ -28,6 +28,7 @@ const EczaneList = (props: any) => {
   };
 
   const [items, setItems] = useState<Item[]>([]);
+  const [kullanicilar, setKullanicilar] = useState<Kullanici[]>([]);
   const [editType, setEditType] = useState<"edit" | "new">("new");
   const [itemDialog, setItemDialog] = useState(false);
   const [deleteItemDialog, setDeleteItemDialog] = useState(false);
@@ -44,9 +45,28 @@ const EczaneList = (props: any) => {
     value: `${i < 10 ? "0" : ""}${i}:00:00`,
   }));
 
+  const [user_id, setUserID] = useState<undefined | null | string>(null);
+  const [yetki, setYetki] = useState<undefined | null | string>(null);
+
+  const router: NextRouter = useRouter();
+
+  useEffect(() => {
+    setUserID(localStorage.getItem("user_id"));
+    setYetki(localStorage.getItem("yetki"));
+
+  }, [router.pathname]);
+
   useEffect(() => {
     axios.get("/eczane").then((response) => setItems(response.data));
+    axios.get("/kullanici").then((response) => setKullanicilar(response.data));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  let kullanicilar_opt = Array.from(
+    kullanicilar.map((kullanici) => ({
+      label: `${kullanici.user_id}`,
+      value: `${kullanici.user_id}`,
+    }))
+  );
 
   const openNew = () => {
     setItem(emptyItem);
@@ -113,8 +133,6 @@ const EczaneList = (props: any) => {
         });
       }
 
-      console.log(_item)
-
       setItems(_items);
       setItemDialog(false);
       setItem(emptyItem);
@@ -123,7 +141,6 @@ const EczaneList = (props: any) => {
 
   const editItem = (item: any) => {
     setItem({ ...item });
-    console.log(item);
     setItemDialog(true);
     setEditType("edit");
   };
@@ -168,16 +185,6 @@ const EczaneList = (props: any) => {
     return index;
   };
 
-  const createId = () => {
-    let id = "";
-    let chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-  };
-
   const confirmDeleteSelected = () => {
     setDeleteItemsDialog(true);
   };
@@ -197,7 +204,6 @@ const EczaneList = (props: any) => {
         })
     );
 
-    console.log(delete_items);
     setItems(_items);
     setDeleteItemsDialog(false);
     setSelectedItems([]);
@@ -219,21 +225,23 @@ const EczaneList = (props: any) => {
 
   const leftToolbarTemplate = () => {
     return (
-      <React.Fragment>
-        <Button
-          label="New"
-          icon="pi pi-plus"
-          className="p-button-success mr-2"
-          onClick={openNew}
-        />
-        <Button
-          label="Delete"
-          icon="pi pi-trash"
-          className="p-button-danger"
-          onClick={confirmDeleteSelected}
-          disabled={!selectedItems || !selectedItems.length}
-        />
-      </React.Fragment>
+      yetki === "admin" ? <>
+        <React.Fragment>
+          <Button
+            label="New"
+            icon="pi pi-plus"
+            className="p-button-success mr-2"
+            onClick={openNew}
+          />
+          <Button
+            label="Delete"
+            icon="pi pi-trash"
+            className="p-button-danger"
+            onClick={confirmDeleteSelected}
+            disabled={!selectedItems || !selectedItems.length}
+          />
+        </React.Fragment>
+      </> : null
     );
   };
 
@@ -256,7 +264,7 @@ const EczaneList = (props: any) => {
 
   const header = (
     <div className="table-header">
-      <h5 className="mx-0 my-1">Manage Items</h5>
+      <h5 className="mx-0 my-1">Eczaneler</h5>
     </div>
   );
 
@@ -342,37 +350,37 @@ const EczaneList = (props: any) => {
             field="isim"
             header="Eczane Adı"
             sortable
-            style={{ minWidth: "14rem" }}
+            style={{ minWidth: "10rem" }}
           ></Column>
           <Column
             field="yonetici_id"
             header="Yönetici TC No"
             sortable
-            style={{ minWidth: "14rem" }}
+            style={{ minWidth: "10rem" }}
           ></Column>
           <Column
             field="adres"
             header="Adres"
             sortable
-            style={{ minWidth: "14rem" }}
+            style={{ minWidth: "10rem" }}
           ></Column>
           <Column
             field="acilis_saati"
             header="Açılış Saati"
             sortable
-            style={{ minWidth: "14rem" }}
+            style={{ minWidth: "10rem" }}
           ></Column>
           <Column
             field="kapanis_saati"
             header="Kapanış Saati"
             sortable
-            style={{ minWidth: "14rem" }}
+            style={{ minWidth: "10rem" }}
           ></Column>
           <Column
             field="telefon_no"
             header="Telefon No"
             sortable
-            style={{ minWidth: "14rem" }}
+            style={{ minWidth: "10rem" }}
           ></Column>
           <Column
             body={actionBodyTemplate}
@@ -407,13 +415,14 @@ const EczaneList = (props: any) => {
         </div>
         <div className="field">
           <label htmlFor="yonetici_id">Yönetici TC No</label>
-          <InputText
+          <Dropdown
             id="yonetici_id"
+            options={kullanicilar_opt}
             value={item.yonetici_id}
             onChange={(e) => onInputChange(e, "yonetici_id")}
-            required
-            autoFocus
-            className={classNames({ "p-invalid": submitted && !item.name })}
+            virtualScrollerOptions={{ itemSize: 38 }}
+            field="label"
+            dropdown
           />
           {submitted && !item.isim && (
             <small className="p-error">Name is required.</small>

@@ -21,7 +21,9 @@ const UrunList = (props: any) => {
     isim: "",
     urun_adı: "",
     satilma_tarihi: "",
+    adet: 0
   };
+
 
   const [items, setItems] = useState<Item[]>([]);
   const [eczaneler, setEczaneler] = useState<Eczane[]>([]);
@@ -77,14 +79,40 @@ const UrunList = (props: any) => {
     setDeleteItemsDialog(false);
   };
 
+  const find_eczane_id = (isim: any) => {
+    let result = "";
+    eczaneler.forEach((eczane) => {
+      if (eczane.isim === isim) {
+        result = eczane.eczane_id;
+      }
+    });
+
+    return result;
+  };
+
+  const find_urun_id = (urun_adı: any) => {
+    let result = "";
+    urunler.forEach((urun) => {
+      if (urun.urun_adı === urun_adı) {
+        result = urun.urun_id;
+      }
+    });
+
+    return result;
+  };
+
   const saveItem = () => {
     setSubmitted(true);
 
-    if (item.eczane_id) {
+    if (item.adet) {
       let _items = [...items];
       let _item = { ...item };
 
       if (editType === "new") {
+
+        _item.eczane_id = find_eczane_id(_item.isim);
+        _item.urun_id = find_urun_id(_item.urun_adı);
+
         axios
           .post("/satis", _item)
           .then((response) => {
@@ -93,13 +121,6 @@ const UrunList = (props: any) => {
           .catch((error) => {
             console.log(error);
           });
-
-        _item.isim = eczaneler.filter(
-          (eczane) => eczane.eczane_id === _item.eczane_id
-        )[0].isim;
-        _item.urun_adı = urunler.filter(
-          (urun) => urun.urun_id === _item.urun_id
-        )[0].urun_adı;
 
         _items.push(_item);
         toast.current.show({
@@ -111,6 +132,9 @@ const UrunList = (props: any) => {
       } else if (editType === "edit") {
         const index = findIndexById(_item.eczane_id, _item.urun_id);
 
+        _item.eczane_id = find_eczane_id(_item.isim);
+        _item.urun_id = find_urun_id(_item.urun_adı);
+
         axios
           .put("/satis", _item)
           .then((response) => {
@@ -120,17 +144,6 @@ const UrunList = (props: any) => {
             console.log(error);
           });
 
-        console.log(
-          eczaneler.filter((eczane) => eczane.eczane_id === _item.eczane_id)[0]
-            .isim
-        );
-
-        _item.isim = eczaneler?.find((eczane) => {
-          return eczane.eczane_id === _item.eczane_id;
-        }).isim;
-        _item.urun_adı = urunler?.find((urun) => {
-          return urun.urun_id === _item.urun_id;
-        }).urun_adı;
         _items[index] = _item;
 
         toast.current.show({
@@ -141,8 +154,6 @@ const UrunList = (props: any) => {
         });
       }
 
-      console.log(_item);
-
       setItems(_items);
       setItemDialog(false);
       setItem(emptyItem);
@@ -151,7 +162,6 @@ const UrunList = (props: any) => {
 
   const editItem = (item: any) => {
     setItem({ ...item });
-    console.log(item);
     setItemDialog(true);
     setEditType("edit");
   };
@@ -162,7 +172,7 @@ const UrunList = (props: any) => {
   };
 
   const deleteItem = () => {
-    let _items = items.filter((val) => val.eczane_id !== item.eczane_id);
+    let _items = items.filter((val) => (val.eczane_id !== item.eczane_id) && (val.urun_id !== item.urun_id));
 
     axios
       .delete("/satis", { data: item })
@@ -196,16 +206,6 @@ const UrunList = (props: any) => {
     return index;
   };
 
-  const createId = () => {
-    let id = "";
-    let chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-  };
-
   const confirmDeleteSelected = () => {
     setDeleteItemsDialog(true);
   };
@@ -225,7 +225,6 @@ const UrunList = (props: any) => {
         })
     );
 
-    console.log(delete_items);
     setItems(_items);
     setDeleteItemsDialog(false);
     setSelectedItems([]);
@@ -292,7 +291,7 @@ const UrunList = (props: any) => {
 
   const header = (
     <div className="table-header">
-      <h5 className="mx-0 my-1">Manage Items</h5>
+      <h5 className="mx-0 my-1">Stoklar</h5>
     </div>
   );
 
@@ -360,7 +359,6 @@ const UrunList = (props: any) => {
           selection={selectedItems}
           onSelectionChange={(e) => {
             setSelectedItems(e.value);
-            console.log(e.value);
           }}
           dataKey="id"
           paginator
@@ -381,19 +379,25 @@ const UrunList = (props: any) => {
             field="urun_adı"
             header="Urun Adı"
             sortable
-            style={{ minWidth: "16rem" }}
+            style={{ minWidth: "13rem" }}
           ></Column>
           <Column
             field="isim"
             header="Eczane Adı"
             sortable
-            style={{ minWidth: "16rem" }}
+            style={{ minWidth: "13rem" }}
           ></Column>
           <Column
             field="adet"
             header="Adet"
             sortable
-            style={{ minWidth: "16rem" }}
+            style={{ minWidth: "13rem" }}
+          ></Column>
+          <Column
+            field="satilma_tarihi"
+            header="Satılma Tarihi"
+            sortable
+            style={{ minWidth: "13rem" }}
           ></Column>
           <Column
             body={actionBodyTemplate}
@@ -413,31 +417,31 @@ const UrunList = (props: any) => {
         onHide={hideDialog}
       >
         <div className="field">
-          <label htmlFor="eczane_id">Eczane</label>
+          <label htmlFor="isim">Eczane</label>
           <Dropdown
-            id="eczane_id"
+            id="isim"
             options={eczane_opt}
             value={item.isim}
             virtualScrollerOptions={{ itemSize: 38 }}
             field="label"
             dropdown
-            onChange={(e) => onInputChange(e, "eczane_id")}
+            onChange={(e) => onInputChange(e, "isim")}
           />
         </div>
         <div className="field">
-          <label htmlFor="urun_id">Ürün</label>
+          <label htmlFor="urun_adı">Ürün</label>
           <Dropdown
-            id="urun_id"
+            id="urun_adı"
             options={urun_opt}
             value={item.urun_adı}
             virtualScrollerOptions={{ itemSize: 38 }}
             field="label"
             dropdown
-            onChange={(e) => onInputChange(e, "urun_id")}
+            onChange={(e) => onInputChange(e, "urun_adı")}
           />
         </div>
         <div className="field">
-          <label htmlFor="adet">satis Adedi</label>
+          <label htmlFor="adet">Satış Adedi</label>
           <InputNumber
             id="adet"
             value={item.adet}
